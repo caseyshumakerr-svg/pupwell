@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#fff9f3" />
+<title>Pupwell v0.2</title>
+<style>
+:root{
+  --ink:#2f2940;--muted:#6d6678;--cream:#fff9f3;--card:#f7eadc;--blue:#4ca9e8;
+  --teal:#58a2a8;--green:#6fa878;--lav:#d9d2f3;--gold:#e7b45b;--dark:#403744;
+  --soft:#f0f2f2;--white:#fffdfb;--shadow:0 14px 34px rgba(86,67,56,.12)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:linear-gradient(#fffaf5,#fff6ef);font-family:ui-rounded,"SF Pro Rounded","SF Pro Display",system-ui,-apple-system,sans-serif;color:var(--ink);min-height:100%}
+body{min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{
+  width:min(100%,430px); min-height:100vh; margin:auto;
+  padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 92px)
+}
+.screen{display:none}.screen.active{display:block}
+.topbar{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;margin:4px 0 14px}
+.topbar .title{text-align:center;font-size:30px;font-weight:900;letter-spacing:-1px}
+.topbar .sub{text-align:center;font-size:13px;color:var(--muted);margin-top:2px}
+.logo{font-weight:950;font-size:24px;letter-spacing:-.5px}
+.day{font-size:12px;color:var(--muted);text-align:right}
+
+.scene{
+  height:335px;border-radius:30px;overflow:hidden;position:relative;
+  background:linear-gradient(155deg,#fff1de 0%,#f7e7d8 58%,#f0dccb 100%);
+  box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center
+}
+.scene.outdoor{background:linear-gradient(#dff2f6 0 42%,#d8e9c8 42% 100%)}
+.sun{position:absolute;width:185px;height:185px;border-radius:50%;background:rgba(255,246,217,.93);right:-58px;top:-58px}
+.cloud{position:absolute;top:42px;left:36px;font-size:34px;opacity:.6}
+.grass{position:absolute;bottom:0;left:0;right:0;height:90px;background:linear-gradient(#b8d59d,#a8c889)}
+.path{position:absolute;bottom:-25px;width:170px;height:170px;background:#e8d0aa;border-radius:50% 50% 0 0;transform:scaleX(.7)}
+.plant{position:absolute;left:18px;bottom:18px;font-size:40px;opacity:.45}
+.rug{position:absolute;width:250px;height:62px;border-radius:50%;background:rgba(213,159,118,.17);bottom:18px}
+.window{position:absolute;right:18px;top:22px;width:96px;height:98px;background:#dbeef5;border:7px solid #fff7ec;border-radius:18px}
+.window:before,.window:after{content:"";position:absolute;background:#fff7ec}.window:before{width:7px;height:100%;left:50%;transform:translateX(-50%)}.window:after{height:7px;width:100%;top:50%;transform:translateY(-50%)}
+.shelf{position:absolute;left:18px;top:26px;width:74px;height:12px;background:#d8b996;border-radius:8px;box-shadow:0 22px 0 #d8b996}
+.leashhook{position:absolute;left:38px;top:54px;width:28px;height:52px;border:5px solid #7f6a66;border-top:0;border-radius:0 0 18px 18px;opacity:.5}
+
+.milo{width:230px;height:210px;z-index:3;transform-origin:50% 85%;transition:.25s ease}
+.milo.wiggle{animation:wiggle .6s ease}.milo.sip{animation:sip .72s ease}.milo.bounce{animation:bounce .65s ease}.milo.leash{animation:leash .9s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) translateY(-4px)}50%{transform:rotate(3deg) translateY(-7px)}75%{transform:rotate(-2deg) translateY(-3px)}}
+@keyframes sip{0%,100%{transform:translateY(0)}45%{transform:translateY(18px) rotate(1deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-17px) rotate(-2deg)}}
+@keyframes leash{0%,100%{transform:rotate(0)}30%{transform:rotate(-5deg) translateX(-5px)}60%{transform:rotate(5deg) translateX(5px)}}
+
+.state{z-index:4;margin-top:-15px;font-size:14px;font-weight:800;color:#5e5360;text-align:center;padding:0 18px}
+.bowl{z-index:4;width:112px;height:50px;border-radius:20px;background:var(--teal);border:3px solid #3f8994;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;margin-top:11px;box-shadow:0 8px 20px rgba(64,113,121,.18)}
+.bowlwater{position:absolute;left:0;right:0;bottom:0;background:#8dd5e6;opacity:.82;transition:height .35s ease}.bowllabel{position:relative;color:#fff;font-size:13px;font-weight:900;letter-spacing:1.5px}
+.leashprop{z-index:4;margin-top:6px;padding:7px 12px;border-radius:999px;background:#fff6ea;color:#6e4d44;font-weight:900;font-size:13px;border:2px solid #e7c5a5;display:none}.leashprop.show{display:block}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.card{background:rgba(255,255,255,.82);border-radius:22px;padding:15px;box-shadow:0 8px 22px rgba(86,67,56,.07)}
+.card h3{margin:0 0 6px;font-size:14px;color:var(--muted)}.big{font-size:24px;font-weight:900}
+.mini{height:8px;border-radius:999px;background:#e8e7e6;margin-top:9px;overflow:hidden}.mini>div{height:100%;border-radius:999px}
+.homeMsg{margin-top:12px;background:#eef7ff;border-radius:20px;padding:15px;color:#4f5269;font-weight:720;line-height:1.35}
+.primary{width:100%;border:0;border-radius:20px;padding:16px;background:var(--dark);color:#fff;font-weight:900;font-size:16px;margin-top:14px}
+
+.stats{padding:20px 4px 0;text-align:center}.amount{font-size:23px;font-weight:650}.amount strong{font-size:32px;font-weight:950}
+.track{height:13px;border-radius:999px;background:#e7e5e4;margin-top:12px;overflow:hidden}.fill{height:100%;background:var(--blue);border-radius:999px;transition:width .35s ease}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.quick button{border:0;background:var(--soft);padding:15px 8px;border-radius:18px;font-weight:900;color:#343449;font-size:15px}
+.custom{width:100%;border:0;background:var(--dark);color:#fff;border-radius:20px;padding:17px;margin-top:14px;font-size:16px;font-weight:900}
+.quick button:active,.custom:active,.primary:active{transform:scale(.98)}
+.message{display:flex;align-items:center;background:#eef7ff;padding:14px;border-radius:19px;margin-top:14px;min-height:68px}.icon{font-size:25px;margin-right:10px}.msgcopy{color:#4d526d;font-weight:700;line-height:1.35}
+.manual{display:none;background:#fff;border-radius:22px;padding:16px;margin-top:12px;box-shadow:0 10px 30px rgba(60,44,39,.1)}.manual.open{display:flex;gap:10px}.manual input{min-width:0;flex:1;border:1px solid #ded8d5;border-radius:14px;padding:12px;font-size:16px}.manual button{border:0;border-radius:14px;padding:0 16px;background:var(--green);color:#fff;font-weight:900}
+.reset{display:block;margin:16px auto 0;border:0;background:transparent;text-decoration:underline;color:#8a7b88;padding:8px;font-size:13px}
+
+.route{margin-top:15px;background:#fff;border-radius:24px;padding:15px;box-shadow:0 8px 22px rgba(86,67,56,.07)}
+.route h3{margin:0 0 12px;font-size:17px}
+.routeRow{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #f0ece9}.routeRow:first-of-type{border-top:0}
+.pin{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#efe9ff;font-size:18px}
+.routeName{font-weight:850}.routeMeta{font-size:12px;color:var(--muted);margin-top:2px}.badge{font-size:12px;font-weight:900;padding:6px 9px;border-radius:999px;background:#edf5ed;color:#4f7b55}.badge.lock{background:#f0eeee;color:#8a8084}
+.walkCard{background:linear-gradient(135deg,#f0eafd,#e6f2ff);border-radius:24px;padding:16px;margin-top:14px;box-shadow:0 8px 22px rgba(86,67,56,.06)}
+.walkCard .row{display:flex;justify-content:space-between;align-items:flex-end}.walkCard .steps{font-size:31px;font-weight:950}.walkCard .dest{font-weight:850;color:#5e5880}
+.progressLine{height:11px;background:#e5e0ef;border-radius:999px;overflow:hidden;margin-top:12px}.progressLine div{height:100%;background:#8a79d0;border-radius:999px;transition:width .35s ease}
+
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,430px);padding:10px 20px calc(env(safe-area-inset-bottom) + 10px);background:rgba(255,250,245,.96);backdrop-filter:blur(14px);display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(96,74,65,.08);z-index:30}
+.nav button{border:0;background:transparent;color:#817786;font-size:11px;font-weight:850;padding:7px 0}.nav button span{display:block;font-size:24px;margin-bottom:3px}.nav button.active{color:#403744}
+.smallNote{text-align:center;color:#8b7d88;font-size:12px;margin-top:8px}
+</style>
+</head>
+<body>
+<main class="app">
+
+<section id="home" class="screen active">
+  <div class="topbar"><div class="logo">Pupwell</div><div></div><div id="day" class="day"></div></div>
+  <div class="scene">
+    <div class="sun"></div><div class="window"></div><div class="shelf"></div><div class="leashhook"></div><div class="plant">🌿</div><div class="rug"></div>
+    <svg id="homeMilo" class="milo" viewBox="0 0 200 180" aria-label="Milo">
+      <ellipse cx="100" cy="146" rx="67" ry="17" fill="#EBD9C6" opacity=".55"/>
+      <ellipse cx="100" cy="112" rx="55" ry="50" fill="#F0B66A"/>
+      <ellipse cx="55" cy="91" rx="24" ry="42" fill="#D78A43" transform="rotate(18 55 91)"/>
+      <ellipse cx="145" cy="91" rx="24" ry="42" fill="#D78A43" transform="rotate(-18 145 91)"/>
+      <ellipse cx="100" cy="93" rx="46" ry="43" fill="#F6C982"/>
+      <ellipse cx="100" cy="112" rx="30" ry="24" fill="#FFF1DC"/>
+      <circle cx="83" cy="88" r="6" fill="#3E2F37"/><circle cx="117" cy="88" r="6" fill="#3E2F37"/>
+      <circle cx="81" cy="86" r="2" fill="#fff"/><circle cx="115" cy="86" r="2" fill="#fff"/>
+      <ellipse cx="100" cy="105" rx="9" ry="7" fill="#3E2F37"/>
+      <path id="homeMouth" d="M 84 92 Q 100 98 116 92" stroke="#3E2F37" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M72 129 Q100 143 128 129 L122 153 Q100 163 78 153 Z" fill="#4FA69A"/><circle cx="100" cy="144" r="6" fill="#F4C056"/>
+    </svg>
+    <div id="homeState" class="state">Milo is ready for the day.</div>
+    <div id="homeLeash" class="leashprop">🦮 leash acquired</div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><h3>Water</h3><div class="big"><span id="homeWater">24</span> oz</div><div class="mini"><div id="homeWaterFill" style="background:var(--blue)"></div></div></div>
+    <div class="card"><h3>Steps</h3><div class="big"><span id="homeSteps">0</span></div><div class="mini"><div id="homeStepFill" style="background:#8a79d0"></div></div></div>
+  </div>
+  <div id="homeMsg" class="homeMsg">A little water or a short walk will make Milo's day.</div>
+  <button class="primary" onclick="showScreen('walk')">Take Milo for a walk</button>
+</section>
+
+<section id="waterScreen" class="screen">
+  <div class="topbar"><div></div><div><div class="title">Water</div><div class="sub">A hydrated you means a happy pup!</div></div><div></div></div>
+  <div class="scene">
+    <div class="sun"></div><div class="plant">🌿</div><div class="rug"></div>
+    <svg id="waterMilo" class="milo" viewBox="0 0 200 180" aria-label="Milo">
+      <ellipse cx="100" cy="146" rx="67" ry="17" fill="#EBD9C6" opacity=".55"/>
+      <ellipse cx="100" cy="112" rx="55" ry="50" fill="#F0B66A"/>
+      <ellipse cx="55" cy="91" rx="24" ry="42" fill="#D78A43" transform="rotate(18 55 91)"/>
+      <ellipse cx="145" cy="91" rx="24" ry="42" fill="#D78A43" transform="rotate(-18 145 91)"/>
+      <ellipse cx="100" cy="93" rx="46" ry="43" fill="#F6C982"/>
+      <ellipse cx="100" cy="112" rx="30" ry="24" fill="#FFF1DC"/>
+      <circle cx="83" cy="88" r="6" fill="#3E2F37"/><circle cx="117" cy="88" r="6" fill="#3E2F37"/>
+      <circle cx="81" cy="86" r="2" fill="#fff"/><circle cx="115" cy="86" r="2" fill="#fff"/>
+      <ellipse cx="100" cy="105" rx="9" ry="7" fill="#3E2F37"/>
+      <path id="waterMouth" d="M 84 92 Q 100 98 116 92" stroke="#3E2F37" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M72 129 Q100 143 128 129 L122 153 Q100 163 78 153 Z" fill="#4FA69A"/><circle cx="100" cy="144" r="6" fill="#F4C056"/>
+    </svg>
+    <div id="waterState" class="state">Milo could use a little drink.</div>
+    <div class="bowl"><div id="bowlwater" class="bowlwater"></div><div class="bowllabel">MILO</div></div>
+  </div>
+  <section class="stats"><div class="amount"><strong id="water">24</strong> / 64 oz</div><div class="track"><div id="waterFill" class="fill"></div></div></section>
+  <div class="quick"><button data-water="8">+8 oz</button><button data-water="16">+16 oz</button><button data-water="24">+24 oz</button></div>
+  <button id="waterCustomBtn" class="custom">Log custom amount</button>
+  <div id="waterManual" class="manual"><input id="waterInput" inputmode="decimal" type="number" min="1" max="64" placeholder="oz"/><button id="waterSave">Add</button></div>
+  <div class="message"><div class="icon">💧</div><div id="waterMessage" class="msgcopy">A hydrated you means a happy pup.</div></div>
+</section>
+
+<section id="walk" class="screen">
+  <div class="topbar"><div></div><div><div class="title">Walk</div><div class="sub">Your steps take Milo somewhere new.</div></div><div></div></div>
+  <div class="scene outdoor">
+    <div class="sun"></div><div class="cloud">☁️</div><div class="grass"></div><div class="path"></div>
+    <svg id="walkMilo" class="milo" viewBox="0 0 200 180" aria-label="Milo walking">
+      <ellipse cx="100" cy="146" rx="67" ry="17" fill="#8da772" opacity=".28"/>
+      <ellipse cx="100" cy="112" rx="55" ry="50" fill="#F0B66A"/>
+      <ellipse cx="55" cy="91" rx="24" ry="42" fill="#D78A43" transform="rotate(18 55 91)"/>
+      <ellipse cx="145" cy="91" rx="24" ry="42" fill="#D78A43" transform="rotate(-18 145 91)"/>
+      <ellipse cx="100" cy="93" rx="46" ry="43" fill="#F6C982"/>
+      <ellipse cx="100" cy="112" rx="30" ry="24" fill="#FFF1DC"/>
+      <circle cx="83" cy="88" r="6" fill="#3E2F37"/><circle cx="117" cy="88" r="6" fill="#3E2F37"/>
+      <circle cx="81" cy="86" r="2" fill="#fff"/><circle cx="115" cy="86" r="2" fill="#fff"/>
+      <ellipse cx="100" cy="105" rx="9" ry="7" fill="#3E2F37"/>
+      <path d="M 78 87 Q 100 105 122 87" stroke="#3E2F37" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M72 129 Q100 143 128 129 L122 153 Q100 163 78 153 Z" fill="#4FA69A"/><circle cx="100" cy="144" r="6" fill="#F4C056"/>
+    </svg>
+    <div id="walkState" class="state">Milo is waiting by the door.</div>
+    <div id="walkLeash" class="leashprop show">🦮 “Walk?”</div>
+  </div>
+
+  <div class="walkCard">
+    <div class="row"><div><div class="steps"><span id="steps">0</span> steps</div><div id="nextText" style="color:var(--muted);font-size:13px;margin-top:3px">1,500 to the neighborhood</div></div><div id="dest" class="dest">Home</div></div>
+    <div class="progressLine"><div id="stepFill"></div></div>
+  </div>
+
+  <div class="quick"><button data-steps="500">+500</button><button data-steps="1000">+1,000</button><button data-steps="2000">+2,000</button></div>
+  <button id="stepCustomBtn" class="custom">Add steps manually</button>
+  <div id="stepManual" class="manual"><input id="stepInput" inputmode="numeric" type="number" min="1" max="50000" placeholder="steps"/><button id="stepSave">Add</button></div>
+  <div class="message"><div class="icon">🐾</div><div id="stepMessage" class="msgcopy">Every step helps Milo explore a little farther.</div></div>
+
+  <div class="route">
+    <h3>Today's adventure</h3>
+    <div class="routeRow"><div class="pin">🏠</div><div><div class="routeName">Home</div><div class="routeMeta">Start here</div></div><div class="badge">Unlocked</div></div>
+    <div class="routeRow"><div class="pin">🌳</div><div><div class="routeName">Neighborhood</div><div class="routeMeta">1,500 steps</div></div><div id="badgeN" class="badge lock">Locked</div></div>
+    <div class="routeRow"><div class="pin">🛝</div><div><div class="routeName">Park</div><div class="routeMeta">4,000 steps</div></div><div id="badgeP" class="badge lock">Locked</div></div>
+    <div class="routeRow"><div class="pin">🌊</div><div><div class="routeName">Lake</div><div class="routeMeta">7,000 steps</div></div><div id="badgeL" class="badge lock">Locked</div></div>
+  </div>
+  <button id="reset" class="reset">Reset demo data</button>
+  <div class="smallNote">Manual logging for prototype. Apple Health sync comes later.</div>
+</section>
+
+</main>
+
+<nav class="nav">
+  <button id="navHome" class="active" onclick="showScreen('home')"><span>🏡</span>Home</button>
+  <button id="navWater" onclick="showScreen('waterScreen')"><span>💧</span>Water</button>
+  <button id="navWalk" onclick="showScreen('walk')"><span>🐾</span>Walk</button>
+</nav>
+
+<script>
+const WATER_GOAL=64, STEP_GOAL=8000;
+let water=Number(localStorage.getItem('pupwell-water')||24);
+let steps=Number(localStorage.getItem('pupwell-steps')||0);
+const $=id=>document.getElementById(id);
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  if(id==='home') $('navHome').classList.add('active');
+  if(id==='waterScreen') $('navWater').classList.add('active');
+  if(id==='walk') $('navWalk').classList.add('active');
+}
+window.showScreen=showScreen;
+
+function animate(el,cls){
+  el.classList.remove('wiggle','sip','bounce','leash');
+  void el.offsetWidth; el.classList.add(cls);
+  setTimeout(()=>el.classList.remove(cls),900);
+}
+
+function waterMood(){
+  const r=Math.min(water/WATER_GOAL,1);
+  if(r>=.75)return ['M 78 86 Q 100 104 122 86','Milo is feeling great!'];
+  if(r>=.35)return ['M 84 92 Q 100 98 116 92','Milo could use a little drink.'];
+  return ['M 86 98 Q 100 88 114 98','Milo is checking his water bowl…'];
+}
+function destination(){
+  if(steps>=7000)return {name:'Lake', next:'Lake unlocked!', pct:1, text:'Milo made it all the way to the lake today.'};
+  if(steps>=4000)return {name:'Park', next:(7000-steps).toLocaleString()+' to the lake', pct:(steps-4000)/3000, text:'Milo is exploring the park.'};
+  if(steps>=1500)return {name:'Neighborhood', next:(4000-steps).toLocaleString()+' to the park', pct:(steps-1500)/2500, text:'Milo is touring the neighborhood.'};
+  return {name:'Home', next:(1500-steps).toLocaleString()+' to the neighborhood', pct:steps/1500, text:'Milo is waiting by the door.'};
+}
+function render(){
+  const wPct=Math.min(water/WATER_GOAL,1), sPct=Math.min(steps/STEP_GOAL,1);
+  $('water').textContent=water; $('homeWater').textContent=water;
+  $('waterFill').style.width=(wPct*100)+'%'; $('homeWaterFill').style.width=(wPct*100)+'%'; $('bowlwater').style.height=Math.max(10,wPct*100)+'%';
+  const [mouth,state]=waterMood(); $('waterMouth').setAttribute('d',mouth); $('homeMouth').setAttribute('d',mouth); $('waterState').textContent=state;
+  $('steps').textContent=steps.toLocaleString(); $('homeSteps').textContent=steps.toLocaleString();
+  $('homeStepFill').style.width=(sPct*100)+'%';
+  const d=destination(); $('dest').textContent=d.name; $('nextText').textContent=d.next; $('stepFill').style.width=(Math.max(0,Math.min(1,d.pct))*100)+'%'; $('walkState').textContent=d.text;
+  $('badgeN').textContent=steps>=1500?'Unlocked':'Locked'; $('badgeN').className='badge'+(steps>=1500?'':' lock');
+  $('badgeP').textContent=steps>=4000?'Unlocked':'Locked'; $('badgeP').className='badge'+(steps>=4000?'':' lock');
+  $('badgeL').textContent=steps>=7000?'Unlocked':'Locked'; $('badgeL').className='badge'+(steps>=7000?'':' lock');
+
+  const leash = steps<1500;
+  $('homeLeash').classList.toggle('show',leash);
+  $('walkLeash').classList.toggle('show',leash);
+
+  if(steps>=7000 && water>=48){$('homeState').textContent='Milo had a very good day.';$('homeMsg').textContent='Lake trip + a full water bowl. Milo is thriving.'}
+  else if(steps<1500){$('homeState').textContent='Milo keeps looking at the leash.';$('homeMsg').textContent='A short walk will get Milo out into the neighborhood.'}
+  else if(water<24){$('homeState').textContent='Milo is checking his water bowl.';$('homeMsg').textContent='The walk was good. Now Milo could use a drink.'}
+  else {$('homeState').textContent='Milo is having a pretty good day.';$('homeMsg').textContent=d.text+' Keep going if you want to see where he gets next.'}
+
+  localStorage.setItem('pupwell-water',water); localStorage.setItem('pupwell-steps',steps);
+}
+function addWater(n){
+  water=Math.min(160,water+n);
+  $('waterMessage').textContent=water>=WATER_GOAL?'Goal reached! Milo does a happy little victory wiggle.':'Milo hears the bowl filling and trots over for a drink.';
+  animate($('waterMilo'),water>=WATER_GOAL?'wiggle':'sip');
+  render();
+}
+function addSteps(n){
+  const before=destination().name; steps=Math.min(50000,steps+n); const after=destination().name;
+  if(after!==before){$('stepMessage').textContent='New place unlocked: '+after+'! Milo is VERY pleased.';animate($('walkMilo'),'bounce')}
+  else if(steps<1500){$('stepMessage').textContent='Milo has the leash. A few more steps gets you into the neighborhood.';animate($('walkMilo'),'leash')}
+  else {$('stepMessage').textContent='Milo is getting farther from home. Keep going!';animate($('walkMilo'),'bounce')}
+  render();
+}
+
+document.querySelectorAll('[data-water]').forEach(b=>b.addEventListener('click',()=>addWater(Number(b.dataset.water))));
+document.querySelectorAll('[data-steps]').forEach(b=>b.addEventListener('click',()=>addSteps(Number(b.dataset.steps))));
+$('waterCustomBtn').addEventListener('click',()=>{$('waterManual').classList.toggle('open');$('waterInput').focus()});
+$('waterSave').addEventListener('click',()=>{const v=Number($('waterInput').value);if(v>0){addWater(v);$('waterInput').value='';$('waterManual').classList.remove('open')}});
+$('stepCustomBtn').addEventListener('click',()=>{$('stepManual').classList.toggle('open');$('stepInput').focus()});
+$('stepSave').addEventListener('click',()=>{const v=Number($('stepInput').value);if(v>0){addSteps(v);$('stepInput').value='';$('stepManual').classList.remove('open')}});
+$('reset').addEventListener('click',()=>{water=24;steps=0;localStorage.removeItem('pupwell-water');localStorage.removeItem('pupwell-steps');$('stepMessage').textContent='Every step helps Milo explore a little farther.';$('waterMessage').textContent='A hydrated you means a happy pup.';render()});
+$('day').textContent=new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(new Date());
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#fff8f1"/>
+<title>Pupwell — Natural Milo Motion Test</title>
+<style>
+:root{
+  --ink:#352c3c;--muted:#73687a;--cream:#fff8f1;--card:#fffdf9;
+  --fur1:#f7c97f;--fur2:#e79a4e;--fur3:#ca7432;--muzzle:#fff0d9;
+  --teal:#4d9f9d;--gold:#efc24e;--blue:#72c8df;--shadow:rgba(79,59,48,.14)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:ui-rounded,"SF Pro Rounded","SF Pro Display",system-ui,-apple-system,sans-serif;background:linear-gradient(#fffaf6,#fff3e8);color:var(--ink)}
+body{min-height:100vh}
+.app{width:min(100%,430px);margin:auto;min-height:100vh;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 28px)}
+.header{text-align:center;margin-bottom:12px}.brand{font-size:30px;font-weight:950;letter-spacing:-1.2px}.sub{font-size:13px;color:var(--muted);margin-top:3px}
+.scene{height:520px;border-radius:32px;background:linear-gradient(180deg,#fff6e7,#f7e5d5);position:relative;overflow:hidden;box-shadow:0 18px 45px var(--shadow)}
+.sun{position:absolute;right:-55px;top:-60px;width:190px;height:190px;border-radius:50%;background:#fff2c7}
+.window{position:absolute;right:24px;top:28px;width:110px;height:120px;background:#d8eff5;border:8px solid #fffaf1;border-radius:18px;box-shadow:0 8px 18px rgba(80,93,92,.08)}
+.window:before,.window:after{content:"";position:absolute;background:#fffaf1}.window:before{left:50%;top:0;bottom:0;width:7px;transform:translateX(-50%)}.window:after{top:50%;left:0;right:0;height:7px;transform:translateY(-50%)}
+.rug{position:absolute;left:50%;transform:translateX(-50%);bottom:34px;width:315px;height:90px;border-radius:50%;background:rgba(196,146,112,.15)}
+.plant{position:absolute;left:18px;bottom:50px;font-size:52px;opacity:.42}
+.stage{position:absolute;inset:70px 0 78px;display:grid;place-items:center}
+svg{width:330px;height:330px;overflow:visible}
+#dog{transform-origin:165px 226px}
+#body,#head,#earL,#earR,#tail,#legFL,#legFR,#legBL,#legBR,#eyes,#mouth,#brows,#collar,#tag,#leash,#bowl,#tongue{transform-box:fill-box}
+#body{transform-origin:center bottom}
+#head{transform-origin:center bottom}
+#earL,#earR{transform-origin:50% 15%}
+#tail{transform-origin:10% 80%}
+#legFL,#legFR,#legBL,#legBR{transform-origin:50% 10%}
+#eyes{transform-origin:center}
+#mouth,#tongue{transform-origin:center top}
+#leash{transform-origin:50% 10%}
+#bowl{transform-origin:center bottom}
+
+.state-idle #leash,.state-idle #bowl,.state-idle #tongue{opacity:0}
+.state-idle #body{animation:idleBreath 3.8s ease-in-out infinite}
+.state-idle #head{animation:idleHead 5.6s ease-in-out infinite}
+.state-idle #tail{animation:idleTail 2.3s ease-in-out infinite}
+.state-idle #legFL{animation:idleWeight 6.5s ease-in-out infinite}
+
+.state-drink #leash{opacity:0}
+.state-drink #bowl{opacity:1}
+.state-drink #tongue{opacity:.22}
+.state-drink #dog{animation:drinkSettle .8s cubic-bezier(.22,.7,.25,1) forwards}
+.state-drink #head{animation:drinkHeadNatural 2.6s ease-in-out infinite}
+.state-drink #body{animation:drinkBody 2.6s ease-in-out infinite}
+.state-drink #tail{animation:drinkTail 2.9s ease-in-out infinite}
+.state-drink #earL{animation:drinkEarL 3.4s ease-in-out infinite}
+.state-drink #earR{animation:drinkEarR 4.1s ease-in-out infinite}
+.state-drink #mouth{animation:drinkMouth 1.3s ease-in-out infinite}
+.state-drink #tongue{animation:tinyTongue 2.2s ease-in-out infinite}
+
+.state-leash #bowl,.state-leash #tongue{opacity:0}
+.state-leash #leash{opacity:1}
+.state-leash #body{animation:readyBody 1.9s ease-in-out infinite}
+.state-leash #head{animation:readyHead 3.1s ease-in-out infinite}
+.state-leash #tail{animation:readyTail 1.25s ease-in-out infinite}
+.state-leash #earL{animation:readyEarL 2.9s ease-in-out infinite}
+.state-leash #earR{animation:readyEarR 3.4s ease-in-out infinite}
+.state-leash #legFL{animation:readyPaw 2.2s ease-in-out infinite}
+.state-leash #leash{animation:readyLeash 2.2s ease-in-out infinite}
+
+@keyframes idleBreath{
+  0%,100%{transform:scaleY(1) translateY(0)}
+  48%{transform:scaleY(1.012) translateY(-1px)}
+}
+@keyframes idleHead{
+  0%,18%,100%{transform:translate(0,0) rotate(0)}
+  48%{transform:translate(1px,1px) rotate(-1deg)}
+  72%{transform:translate(-1px,0) rotate(.6deg)}
+}
+@keyframes idleTail{
+  0%,100%{transform:rotate(-6deg)}
+  35%{transform:rotate(9deg)}
+  58%{transform:rotate(3deg)}
+  82%{transform:rotate(11deg)}
+}
+@keyframes idleWeight{
+  0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(1px) rotate(-1.5deg)}
+}
+
+@keyframes drinkSettle{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(10px)}
+}
+@keyframes drinkHeadNatural{
+  0%,100%{transform:translateY(36px) rotate(3deg)}
+  38%{transform:translateY(43px) rotate(4deg)}
+  62%{transform:translateY(40px) rotate(3.5deg)}
+}
+@keyframes drinkBody{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(1.5px)}
+}
+@keyframes drinkTail{
+  0%,100%{transform:rotate(-2deg)}
+  40%{transform:rotate(8deg)}
+  70%{transform:rotate(4deg)}
+}
+@keyframes drinkEarL{
+  0%,100%{transform:rotate(1deg)}
+  55%{transform:rotate(5deg)}
+}
+@keyframes drinkEarR{
+  0%,100%{transform:rotate(-1deg)}
+  46%{transform:rotate(-4deg)}
+}
+@keyframes drinkMouth{
+  0%,100%{transform:scaleY(1)}
+  50%{transform:scaleY(.94)}
+}
+@keyframes tinyTongue{
+  0%,78%,100%{transform:scaleY(.15) translateY(0);opacity:0}
+  86%{transform:scaleY(.45) translateY(2px);opacity:.20}
+  92%{transform:scaleY(.20) translateY(0);opacity:.08}
+}
+
+@keyframes readyBody{
+  0%,100%{transform:translate(0,0)}
+  38%{transform:translate(-2px,-2px)}
+  68%{transform:translate(1px,0)}
+}
+@keyframes readyHead{
+  0%,20%,100%{transform:rotate(-1deg)}
+  42%{transform:rotate(3deg) translateY(-1px)}
+  65%{transform:rotate(1deg)}
+}
+@keyframes readyTail{
+  0%,100%{transform:rotate(-14deg)}
+  32%{transform:rotate(20deg)}
+  62%{transform:rotate(6deg)}
+  84%{transform:rotate(23deg)}
+}
+@keyframes readyEarL{
+  0%,100%{transform:rotate(-1deg)}
+  44%{transform:rotate(5deg)}
+}
+@keyframes readyEarR{
+  0%,100%{transform:rotate(1deg)}
+  52%{transform:rotate(-4deg)}
+}
+@keyframes readyPaw{
+  0%,100%{transform:translateY(0) rotate(0)}
+  45%{transform:translateY(-5px) rotate(-8deg)}
+  65%{transform:translateY(-3px) rotate(-4deg)}
+}
+@keyframes readyLeash{
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  45%{transform:translateY(3px) rotate(2deg)}
+  70%{transform:translateY(1px) rotate(0deg)}
+}
+
+.status{position:absolute;left:18px;right:18px;bottom:20px;background:rgba(255,255,255,.82);backdrop-filter:blur(10px);border-radius:20px;padding:14px 15px;text-align:center;font-weight:800;color:#5c5060}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.controls button{border:0;border-radius:18px;padding:14px 8px;font-weight:900;color:#403746;background:#eef0f0;box-shadow:0 6px 18px rgba(71,58,52,.06)}
+.controls button.active{background:#403746;color:white}
+.note{margin-top:12px;background:#fff;border-radius:20px;padding:14px;color:#615769;font-size:14px;line-height:1.4;box-shadow:0 8px 22px rgba(71,58,52,.06)}
+.small{text-align:center;color:#8a7f8a;font-size:12px;margin-top:9px}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="header">
+    <div class="brand">Pupwell</div>
+    <div class="sub">Natural Milo motion test</div>
+  </div>
+
+  <section class="scene">
+    <div class="sun"></div>
+    <div class="window"></div>
+    <div class="plant">🌿</div>
+    <div class="rug"></div>
+
+    <div class="stage">
+      <svg id="miloSvg" viewBox="0 0 330 330" aria-label="Animated cartoon dog Milo">
+        <defs>
+          <linearGradient id="fur" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#F9D39A"/>
+            <stop offset=".55" stop-color="#F0B76C"/>
+            <stop offset="1" stop-color="#DB8B43"/>
+          </linearGradient>
+          <linearGradient id="earFur" x1="0" x2="1">
+            <stop offset="0" stop-color="#D47A33"/>
+            <stop offset="1" stop-color="#B85F27"/>
+          </linearGradient>
+          <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#7a5b49" flood-opacity=".18"/>
+          </filter>
+        </defs>
+
+        <g id="dog" class="state-idle">
+          <ellipse cx="163" cy="273" rx="104" ry="22" fill="#c9ad96" opacity=".22"/>
+
+          <g id="tail">
+            <path d="M230 212 C292 180 297 220 269 231 C253 238 244 229 250 219 C261 202 250 195 232 205 Z" fill="url(#fur)" stroke="#c97a39" stroke-width="3"/>
+          </g>
+
+          <g id="legBL">
+            <ellipse cx="108" cy="238" rx="24" ry="42" fill="#E6A055"/>
+            <ellipse cx="104" cy="269" rx="23" ry="14" fill="#F5C987"/>
+          </g>
+          <g id="legBR">
+            <ellipse cx="220" cy="238" rx="24" ry="42" fill="#E6A055"/>
+            <ellipse cx="224" cy="269" rx="23" ry="14" fill="#F5C987"/>
+          </g>
+
+          <g id="body">
+            <ellipse cx="164" cy="202" rx="77" ry="83" fill="url(#fur)" stroke="#d78a43" stroke-width="3"/>
+            <ellipse cx="164" cy="219" rx="39" ry="53" fill="#FFE6C6" opacity=".95"/>
+          </g>
+
+          <g id="legFL">
+            <ellipse cx="121" cy="232" rx="20" ry="48" fill="#F0B66A"/>
+            <ellipse cx="118" cy="272" rx="23" ry="14" fill="#F9D08E"/>
+            <path d="M105 271 q13 7 26 0" fill="none" stroke="#d68c48" stroke-width="2"/>
+          </g>
+          <g id="legFR">
+            <ellipse cx="207" cy="232" rx="20" ry="48" fill="#F0B66A"/>
+            <ellipse cx="210" cy="272" rx="23" ry="14" fill="#F9D08E"/>
+            <path d="M197 271 q13 7 26 0" fill="none" stroke="#d68c48" stroke-width="2"/>
+          </g>
+
+          <g id="head" filter="url(#softShadow)">
+            <ellipse cx="164" cy="120" rx="73" ry="70" fill="url(#fur)" stroke="#d78a43" stroke-width="3"/>
+
+            <g id="earL">
+              <path d="M107 77 C67 67 59 101 74 137 C84 160 106 161 119 139 C129 120 128 94 107 77 Z" fill="url(#earFur)"/>
+              <path d="M101 88 C80 84 80 107 90 131 C96 142 105 141 111 130 C116 115 117 98 101 88 Z" fill="#e89c5d" opacity=".6"/>
+            </g>
+            <g id="earR">
+              <path d="M220 77 C260 67 269 101 254 137 C244 160 222 161 209 139 C199 120 199 94 220 77 Z" fill="url(#earFur)"/>
+              <path d="M227 88 C248 84 248 107 238 131 C232 142 223 141 217 130 C212 115 211 98 227 88 Z" fill="#e89c5d" opacity=".6"/>
+            </g>
+
+            <g id="brows" stroke="#79502f" stroke-width="5" fill="none" stroke-linecap="round">
+              <path d="M126 92 Q140 84 151 91"/>
+              <path d="M177 91 Q189 84 202 92"/>
+            </g>
+
+            <g id="eyes">
+              <ellipse cx="139" cy="111" rx="13" ry="16" fill="#fff"/>
+              <ellipse cx="189" cy="111" rx="13" ry="16" fill="#fff"/>
+              <ellipse cx="141" cy="115" rx="7" ry="10" fill="#3a2830"/>
+              <ellipse cx="187" cy="115" rx="7" ry="10" fill="#3a2830"/>
+              <circle cx="138" cy="110" r="2.7" fill="#fff"/>
+              <circle cx="184" cy="110" r="2.7" fill="#fff"/>
+            </g>
+
+            <ellipse cx="164" cy="142" rx="43" ry="31" fill="#FFF0D9"/>
+            <ellipse cx="164" cy="132" rx="12" ry="9" fill="#3a2830"/>
+            <g id="mouth">
+              <path d="M149 145 Q164 158 179 145" fill="none" stroke="#4a3032" stroke-width="4" stroke-linecap="round"/>
+              <path d="M164 140 L164 148" stroke="#4a3032" stroke-width="3" stroke-linecap="round"/>
+              <path d="M151 154 Q164 169 177 154 Q171 178 164 180 Q157 178 151 154 Z" fill="#9e4c50"/>
+            </g>
+            <g id="tongue" opacity="0">
+              <ellipse cx="164" cy="174" rx="9" ry="16" fill="#ef8d93"/>
+              <path d="M164 162 v20" stroke="#c96d74" stroke-width="2" opacity=".55"/>
+            </g>
+          </g>
+
+          <g id="collar">
+            <path d="M119 166 Q164 188 209 166 L203 184 Q164 198 125 184 Z" fill="#4D9F9D"/>
+            <circle id="tag" cx="164" cy="189" r="10" fill="#EFC24E" stroke="#b98d2d" stroke-width="2"/>
+            <path d="M160 187 q4 -5 8 0 q-4 7 -8 0" fill="#fff4bd"/>
+          </g>
+
+          <g id="bowl" opacity="0">
+            <ellipse cx="164" cy="299" rx="61" ry="15" fill="#3b8995"/>
+            <path d="M111 275 Q164 264 217 275 L208 303 Q164 314 120 303 Z" fill="#55A7B2" stroke="#3B8995" stroke-width="3"/>
+            <ellipse cx="164" cy="277" rx="52" ry="10" fill="#8FD8E7"/>
+            <text x="164" y="298" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">MILO</text>
+          </g>
+
+          <g id="leash" opacity="0">
+            <path d="M153 157 C136 180 137 220 151 235 C165 251 186 243 184 225 C181 204 157 195 157 174" fill="none" stroke="#287f83" stroke-width="8" stroke-linecap="round"/>
+            <path d="M174 158 C192 176 208 205 202 229 C198 246 183 251 174 242" fill="none" stroke="#287f83" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="203" cy="231" r="7" fill="none" stroke="#7b7777" stroke-width="4"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div id="status" class="status">Idle: soft breathing, small weight shifts, occasional tail movement.</div>
+  </section>
+
+  <div class="controls">
+    <button class="active" data-state="idle">Idle</button>
+    <button data-state="drink">Drink</button>
+    <button data-state="leash">Walk?</button>
+  </div>
+
+  <div class="note">
+    This is still an animation proof, not final art. This version is intentionally subtler: Milo should feel like a real dog quietly moving, not a toy looping the same motion.
+  </div>
+  <div class="small">Compare the overall feel more than any single motion: it should read as soft, irregular, and natural rather than repetitive.</div>
+</main>
+
+<script>
+const dog=document.getElementById('dog');
+const status=document.getElementById('status');
+const eyes=document.getElementById('eyes');
+const earL=document.getElementById('earL');
+const earR=document.getElementById('earR');
+const buttons=[...document.querySelectorAll('[data-state]')];
+let current='idle', blinkTimer=null, earTimer=null;
+const copy={
+  idle:'Idle: soft breathing, small weight shifts, occasional tail movement.',
+  drink:'Drinking: head stays low with subtle jaw/body motion; tongue is barely visible.',
+  leash:'Walk-ready: weight shifts forward, one paw lifts, tail perks up, leash moves naturally.'
+};
+
+function blinkOnce(){
+  eyes.animate(
+    [{transform:'scaleY(1)'},{transform:'scaleY(.08)'},{transform:'scaleY(1)'}],
+    {duration:150,easing:'ease-in-out'}
+  );
+}
+function earTwitch(){
+  const ear=Math.random()>.5?earL:earR;
+  const dir=ear===earL?-1:1;
+  ear.animate(
+    [{transform:'rotate(0deg)'},{transform:`rotate(${dir*5}deg)`},{transform:'rotate(0deg)'}],
+    {duration:240,easing:'ease-in-out'}
+  );
+}
+function scheduleNaturalBits(){
+  clearTimeout(blinkTimer); clearTimeout(earTimer);
+  const blinkDelay=2200+Math.random()*4200;
+  blinkTimer=setTimeout(()=>{blinkOnce(); scheduleNaturalBits();},blinkDelay);
+  if(current!=='drink'){
+    earTimer=setTimeout(()=>{earTwitch();},3800+Math.random()*5000);
+  }
+}
+function setState(s){
+  current=s;
+  dog.setAttribute('class','state-'+s);
+  buttons.forEach(b=>b.classList.toggle('active',b.dataset.state===s));
+  status.textContent=copy[s];
+  scheduleNaturalBits();
+}
+buttons.forEach(b=>b.addEventListener('click',()=>setState(b.dataset.state)));
+setState('idle');
+</script>
+</body>
+</html>
